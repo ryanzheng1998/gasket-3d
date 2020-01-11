@@ -1,6 +1,8 @@
-# 3d_gasket2-mobile
+# WebGL 3d gasket
+使用 WebGL 繪製 Surface Subdivision 以及 Volume Subdivision 的立體三角碎形。
 
-## Project setup
+## Getting Started
+### Installing
 ```
 npm install
 ```
@@ -15,10 +17,9 @@ npm run serve
 npm run build
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
+# Built With
+* Vue
+* Ionic 4
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
