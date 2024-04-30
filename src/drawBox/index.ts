@@ -1,4 +1,6 @@
 import { mat4 } from "gl-matrix";
+import { boxIndices } from "./boxIndices";
+import { boxVertex } from "./boxVertex";
 import fragmentShaderText from "./fragmentShader.glsl?raw";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
@@ -13,93 +15,9 @@ export const drawBox = (canvas: HTMLCanvasElement) => {
     return;
   }
 
-  const vertexData = [
-    // Top
-    -1.0, 1.0, -1.0, 0.5, 0.5, 0.5,
-    //
-    -1.0, 1.0, 1.0, 0.5, 0.5, 0.5,
-    //
-    1.0, 1.0, 1.0, 0.5, 0.5, 0.5,
-    //
-    1.0, 1.0, -1.0, 0.5, 0.5, 0.5,
+  const vertexData = boxVertex;
 
-    // Left
-    -1.0, 1.0, 1.0, 0.75, 0.25, 0.5,
-    //
-    -1.0, -1.0, 1.0, 0.75, 0.25, 0.5,
-    //
-    -1.0, -1.0, -1.0, 0.75, 0.25, 0.5,
-    //
-    -1.0, 1.0, -1.0, 0.75, 0.25, 0.5,
-
-    // Right
-    1.0, 1.0, 1.0, 0.25, 0.25, 0.75,
-    //
-    1.0, -1.0, 1.0, 0.25, 0.25, 0.75,
-    //
-    1.0, -1.0, -1.0, 0.25, 0.25, 0.75,
-    //
-    1.0, 1.0, -1.0, 0.25, 0.25, 0.75,
-
-    // Front
-    1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
-    //
-    1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
-    //
-    -1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
-    //
-    -1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
-
-    // Back
-    1.0, 1.0, -1.0, 0.0, 1.0, 0.15,
-    //
-    1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
-    //
-    -1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
-    //
-    -1.0, 1.0, -1.0, 0.0, 1.0, 0.15,
-
-    // Bottom
-    -1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
-    //
-    -1.0, -1.0, 1.0, 0.5, 0.5, 1.0,
-    //
-    1.0, -1.0, 1.0, 0.5, 0.5, 1.0,
-    //
-    1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
-  ];
-
-  const boxIndices = [
-    // Top
-    0, 1, 2,
-    //
-    0, 2, 3,
-
-    // Left
-    5, 4, 6,
-    //
-    6, 4, 7,
-
-    // Right
-    8, 9, 10,
-    //
-    8, 10, 11,
-
-    // Front
-    13, 12, 14,
-    //
-    15, 14, 12,
-
-    // Back
-    16, 17, 18,
-    //
-    16, 18, 19,
-
-    // Bottom
-    21, 20, 22,
-    //
-    22, 20, 23,
-  ];
+  const indices = boxIndices;
 
   //
   // create buffer and load data into it
@@ -112,7 +30,7 @@ export const drawBox = (canvas: HTMLCanvasElement) => {
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.bufferData(
     gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(boxIndices),
+    new Uint16Array(indices),
     gl.STATIC_DRAW,
   );
 
@@ -246,7 +164,7 @@ export const drawBox = (canvas: HTMLCanvasElement) => {
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
     requestAnimationFrame(draw(t2));
   };
