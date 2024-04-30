@@ -1,10 +1,11 @@
 import { mat4 } from "gl-matrix";
+import { useStore } from "../useStore";
 import { boxIndices } from "./boxIndices";
 import { boxVertex } from "./boxVertex";
 import fragmentShaderText from "./fragmentShader.glsl?raw";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
-export const drawBox = (canvas: HTMLCanvasElement) => {
+export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
@@ -149,14 +150,13 @@ export const drawBox = (canvas: HTMLCanvasElement) => {
 
   let animationId: number;
 
-  const draw = (t1: number) => (t2: number) => {
-    const deltaTime = t2 - t1;
+  const draw = () => (t2: number) => {
+    const state = useStore.getState();
 
-    mat4.rotateY(
-      modelMatrix,
-      modelMatrix,
-      ((Math.PI / 2 / 70) * deltaTime) / 16,
-    );
+    mat4.identity(modelMatrix);
+    mat4.rotateX(modelMatrix, modelMatrix, state.rotationX);
+    mat4.rotateY(modelMatrix, modelMatrix, state.rotationY);
+    mat4.rotateZ(modelMatrix, modelMatrix, state.rotationZ);
 
     const finalMatrix = mat4.create();
     mat4.multiply(finalMatrix, viewMatrix, modelMatrix);
@@ -181,7 +181,7 @@ export const drawBox = (canvas: HTMLCanvasElement) => {
     gl.viewport(0, 0, canvas.width, canvas.height);
     cancelAnimationFrame(animationId);
     window.removeEventListener("resize", onResize);
-    drawBox(canvas);
+    drawBoxMouseRotate(canvas);
   };
 
   window.addEventListener("resize", onResize);

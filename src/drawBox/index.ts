@@ -181,7 +181,7 @@ export const drawBox = (canvas: HTMLCanvasElement) => {
     gl.viewport(0, 0, canvas.width, canvas.height);
     cancelAnimationFrame(animationId);
     window.removeEventListener("resize", onResize);
-    drawBox(canvas);
+    drawBox;
   };
 
   window.addEventListener("resize", onResize);
