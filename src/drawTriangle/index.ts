@@ -11,11 +11,11 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
 
   const vertexData = [
     //
-    0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.5, 0.0, 1.0, 0.0, 0.0,
     //
-    -1.0, -1.0, 0.0, 0.0, 1.0, 0.0,
+    -0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
     //
-    1.0, -1.0, 0.0, 0.0, 0.0, 1.0,
+    0.5, -0.5, 0.0, 0.0, 0.0, 1.0,
   ];
 
   //
@@ -117,6 +117,7 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
   gl.useProgram(program);
   gl.enable(gl.DEPTH_TEST);
 
+  //
   // draw
   //
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
