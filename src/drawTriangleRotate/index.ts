@@ -120,29 +120,34 @@ export const drawTriangleRotate = (canvas: HTMLCanvasElement) => {
 
   const matrixUniformLocation = gl.getUniformLocation(program, "matrix");
 
-  const modelMatrix = mat4.create();
-  const viewMatrix = mat4.create();
-  const projectionMatrix = mat4.create();
   //
   // draw
   //
-  const draw = () => {
-    {
-      mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 2 / 70);
+  const modelMatrix = mat4.create();
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
 
-      const finalMatrix = mat4.create();
-      mat4.multiply(finalMatrix, viewMatrix, modelMatrix);
-      mat4.multiply(finalMatrix, projectionMatrix, finalMatrix);
+  const draw = (t1: number) => (t2: number) => {
+    const deltaTime = t2 - t1;
+    mat4.rotateY(
+      modelMatrix,
+      modelMatrix,
+      ((Math.PI / 2 / 70) * deltaTime) / 16,
+    );
 
-      gl.uniformMatrix4fv(matrixUniformLocation, false, finalMatrix);
-    }
+    const finalMatrix = mat4.create();
+    mat4.multiply(finalMatrix, viewMatrix, modelMatrix);
+    mat4.multiply(finalMatrix, projectionMatrix, finalMatrix);
+
+    gl.uniformMatrix4fv(matrixUniformLocation, false, finalMatrix);
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-    requestAnimationFrame(draw);
+    requestAnimationFrame(draw(t2));
   };
 
-  draw();
+  const now = performance.now();
+  draw(now)(now);
 };
