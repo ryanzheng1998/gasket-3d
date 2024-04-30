@@ -2,6 +2,9 @@ import fragmentShaderText from "./fragmentShader.glsl?raw";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
 export const drawTriangle = (canvas: HTMLCanvasElement) => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
   const gl = canvas.getContext("webgl");
 
   if (!gl) {

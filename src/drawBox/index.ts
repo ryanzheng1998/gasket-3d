@@ -1,7 +1,11 @@
+import { mat4 } from "gl-matrix";
 import fragmentShaderText from "./fragmentShader.glsl?raw";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
-export const drawTriangle = (canvas: HTMLCanvasElement) => {
+export const drawBox = (canvas: HTMLCanvasElement) => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
   const gl = canvas.getContext("webgl");
 
   if (!gl) {
@@ -10,20 +14,107 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
   }
 
   const vertexData = [
+    // Top
+    -1.0, 1.0, -1.0, 0.5, 0.5, 0.5,
     //
-    0.0, 0.5, 0.0, 1.0, 0.0, 0.0,
+    -1.0, 1.0, 1.0, 0.5, 0.5, 0.5,
     //
-    -0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
+    1.0, 1.0, 1.0, 0.5, 0.5, 0.5,
     //
-    0.5, -0.5, 0.0, 0.0, 0.0, 1.0,
+    1.0, 1.0, -1.0, 0.5, 0.5, 0.5,
+
+    // Left
+    -1.0, 1.0, 1.0, 0.75, 0.25, 0.5,
+    //
+    -1.0, -1.0, 1.0, 0.75, 0.25, 0.5,
+    //
+    -1.0, -1.0, -1.0, 0.75, 0.25, 0.5,
+    //
+    -1.0, 1.0, -1.0, 0.75, 0.25, 0.5,
+
+    // Right
+    1.0, 1.0, 1.0, 0.25, 0.25, 0.75,
+    //
+    1.0, -1.0, 1.0, 0.25, 0.25, 0.75,
+    //
+    1.0, -1.0, -1.0, 0.25, 0.25, 0.75,
+    //
+    1.0, 1.0, -1.0, 0.25, 0.25, 0.75,
+
+    // Front
+    1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
+    //
+    1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
+    //
+    -1.0, -1.0, 1.0, 1.0, 0.0, 0.15,
+    //
+    -1.0, 1.0, 1.0, 1.0, 0.0, 0.15,
+
+    // Back
+    1.0, 1.0, -1.0, 0.0, 1.0, 0.15,
+    //
+    1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
+    //
+    -1.0, -1.0, -1.0, 0.0, 1.0, 0.15,
+    //
+    -1.0, 1.0, -1.0, 0.0, 1.0, 0.15,
+
+    // Bottom
+    -1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
+    //
+    -1.0, -1.0, 1.0, 0.5, 0.5, 1.0,
+    //
+    1.0, -1.0, 1.0, 0.5, 0.5, 1.0,
+    //
+    1.0, -1.0, -1.0, 0.5, 0.5, 1.0,
+  ];
+
+  const boxIndices = [
+    // Top
+    0, 1, 2,
+    //
+    0, 2, 3,
+
+    // Left
+    5, 4, 6,
+    //
+    6, 4, 7,
+
+    // Right
+    8, 9, 10,
+    //
+    8, 10, 11,
+
+    // Front
+    13, 12, 14,
+    //
+    15, 14, 12,
+
+    // Back
+    16, 17, 18,
+    //
+    16, 18, 19,
+
+    // Bottom
+    21, 20, 22,
+    //
+    22, 20, 23,
   ];
 
   //
-  // create vertexBuffer and load vertexData into it
+  // create buffer and load data into it
   //
   const vertexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
+
+  const indexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(
+    gl.ELEMENT_ARRAY_BUFFER,
+    new Uint16Array(boxIndices),
+    gl.STATIC_DRAW,
+  );
 
   //
   // vertex shader
@@ -87,6 +178,15 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
   }
 
   //
+  // set the program as part of the current rendering state
+  //
+  gl.useProgram(program);
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.CULL_FACE);
+  gl.frontFace(gl.CCW);
+  gl.cullFace(gl.BACK);
+
+  //
   // enable vertex attributes
   //
   const positionAttribLocation = gl.getAttribLocation(program, "position");
@@ -111,19 +211,46 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
     3 * Float32Array.BYTES_PER_ELEMENT,
   );
 
-  //
-  // set the program as part of the current rendering state
-  //
-  gl.useProgram(program);
-  gl.enable(gl.DEPTH_TEST);
+  const matrixUniformLocation = gl.getUniformLocation(program, "matrix");
 
   //
   // draw
   //
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  const modelMatrix = mat4.create();
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
 
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
+  mat4.perspective(
+    projectionMatrix,
+    Math.PI / 4,
+    canvas.width / canvas.height,
+    0.1,
+    1000,
+  );
 
-  // gl.uniformMatrix4fv(uniformLocations.matrix, false, mvpMatrix)
+  const draw = (t1: number) => (t2: number) => {
+    const deltaTime = t2 - t1;
+
+    mat4.rotateY(
+      modelMatrix,
+      modelMatrix,
+      ((Math.PI / 2 / 70) * deltaTime) / 16,
+    );
+
+    const finalMatrix = mat4.create();
+    mat4.multiply(finalMatrix, viewMatrix, modelMatrix);
+    mat4.multiply(finalMatrix, projectionMatrix, finalMatrix);
+
+    gl.uniformMatrix4fv(matrixUniformLocation, false, finalMatrix);
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
+
+    requestAnimationFrame(draw(t2));
+  };
+
+  const now = performance.now();
+  draw(now)(now);
 };
