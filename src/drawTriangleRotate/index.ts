@@ -1,7 +1,8 @@
+import { mat4 } from "gl-matrix";
 import fragmentShaderText from "./fragmentShader.glsl?raw";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
-export const drawTriangle = (canvas: HTMLCanvasElement) => {
+export const drawTriangleRotate = (canvas: HTMLCanvasElement) => {
   const gl = canvas.getContext("webgl");
 
   if (!gl) {
@@ -10,7 +11,7 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
   }
 
   const vertexData = [
-    //
+    // x, y, z, r, g, b
     0.0, 0.5, 0.0, 1.0, 0.0, 0.0,
     //
     -0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
@@ -87,6 +88,12 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
   }
 
   //
+  // set the program as part of the current rendering state
+  //
+  gl.useProgram(program);
+  gl.enable(gl.DEPTH_TEST);
+
+  //
   // enable vertex attributes
   //
   const positionAttribLocation = gl.getAttribLocation(program, "position");
@@ -111,19 +118,31 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
     3 * Float32Array.BYTES_PER_ELEMENT,
   );
 
-  //
-  // set the program as part of the current rendering state
-  //
-  gl.useProgram(program);
-  gl.enable(gl.DEPTH_TEST);
+  const matrixUniformLocation = gl.getUniformLocation(program, "matrix");
 
+  const modelMatrix = mat4.create();
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
   //
   // draw
   //
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  const draw = () => {
+    {
+      mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 2 / 70);
 
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+      const finalMatrix = mat4.create();
+      mat4.multiply(finalMatrix, viewMatrix, modelMatrix);
+      mat4.multiply(finalMatrix, projectionMatrix, finalMatrix);
 
-  // gl.uniformMatrix4fv(uniformLocations.matrix, false, mvpMatrix)
+      gl.uniformMatrix4fv(matrixUniformLocation, false, finalMatrix);
+    }
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    requestAnimationFrame(draw);
+  };
+
+  draw();
 };

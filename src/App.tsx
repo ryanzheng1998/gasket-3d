@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import { drawTriangle } from "./drawTriangle";
+import { drawTriangleRotate } from "./drawTriangleRotate";
 
 function App() {
   useEffect(() => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
     // drawGasket(canvas);
-    drawTriangle(canvas);
+    drawTriangleRotate(canvas);
   }, []);
 
   return (
