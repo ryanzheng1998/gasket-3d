@@ -10,7 +10,7 @@ export const drawTriangle = (canvas: HTMLCanvasElement) => {
   }
 
   const vertexData = [
-    //
+    // x, y, z, r, g, b
     0.0, 0.5, 0.0, 1.0, 0.0, 0.0,
     //
     -0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
