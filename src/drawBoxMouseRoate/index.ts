@@ -150,13 +150,13 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
 
   let animationId: number;
 
-  const draw = () => (t2: number) => {
+  const draw = (t1: number) => (t2: number) => {
     const state = useStore.getState();
 
     mat4.identity(modelMatrix);
-    mat4.rotateX(modelMatrix, modelMatrix, state.rotationX);
-    mat4.rotateY(modelMatrix, modelMatrix, state.rotationY);
-    mat4.rotateZ(modelMatrix, modelMatrix, state.rotationZ);
+    mat4.rotateX(modelMatrix, modelMatrix, (state.rotationX / 360) * Math.PI);
+    mat4.rotateY(modelMatrix, modelMatrix, (state.rotationY / 360) * Math.PI);
+    mat4.rotateZ(modelMatrix, modelMatrix, (state.rotationZ / 360) * Math.PI);
 
     const finalMatrix = mat4.create();
     mat4.multiply(finalMatrix, viewMatrix, modelMatrix);

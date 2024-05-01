@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { drawBoxMouseRotate } from "./drawBoxMouseRoate";
+import { clamp } from "./functions/clamp";
 import { useStore } from "./useStore";
 
 function App() {
   useEffect(() => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-
     drawBoxMouseRotate(canvas);
   }, []);
 
@@ -17,15 +17,13 @@ function App() {
         onMouseDown={() => {
           const onMouseMove = (e: MouseEvent) => {
             const state = useStore.getState();
-            console.log(
-              e.movementX,
-              e.movementY,
-              state.rotationX,
-              state.rotationY,
-            );
+            console.log(state.rotationX, state.rotationY);
+
+            const rotationX = state.rotationX - e.movementY;
+
             useStore.setState({
-              rotationX: state.rotationX - e.movementY / 500,
-              rotationY: state.rotationY + e.movementX / 500,
+              rotationX: clamp(rotationX, -180, 180),
+              rotationY: state.rotationY + e.movementX,
             });
           };
 
@@ -33,13 +31,6 @@ function App() {
             window.removeEventListener("mousemove", onMouseMove);
             window.removeEventListener("mouseup", onMouseUp);
           };
-
-          // setInterval(() => {
-          //   const state = useStore.getState();
-          //   useStore.setState({
-          //     rotationX: state.rotationX + 0.01,
-          //   });
-          // }, 100);
 
           window.addEventListener("mousemove", onMouseMove);
           window.addEventListener("mouseup", onMouseUp);
