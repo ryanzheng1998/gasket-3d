@@ -1,42 +1,41 @@
 import { useEffect } from "react";
-import { drawBoxMouseRotate } from "./drawBoxMouseRoate";
+import { drawPyramid } from "./drawPyramid";
 import { clamp } from "./functions/clamp";
 import { useStore } from "./useStore";
 
 function App() {
   useEffect(() => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    drawBoxMouseRotate(canvas);
+    drawPyramid(canvas);
   }, []);
 
   return (
-    <>
-      <canvas
-        id="canvas"
-        className="h-screen w-screen"
-        onMouseDown={() => {
-          const onMouseMove = (e: MouseEvent) => {
-            const state = useStore.getState();
-            console.log(state.rotationX, state.rotationY);
+    <canvas
+      id="canvas"
+      className="w-svh h-svh"
+      onPointerDown={(e) => {
+        e.currentTarget.setPointerCapture(e.pointerId);
 
-            const rotationX = state.rotationX - e.movementY;
+        const onPointerMove = (e: MouseEvent) => {
+          const state = useStore.getState();
 
-            useStore.setState({
-              rotationX: clamp(rotationX, -180, 180),
-              rotationY: state.rotationY + e.movementX,
-            });
-          };
+          const rotationX = state.rotationX - e.movementY;
 
-          const onMouseUp = () => {
-            window.removeEventListener("mousemove", onMouseMove);
-            window.removeEventListener("mouseup", onMouseUp);
-          };
+          useStore.setState({
+            rotationX: clamp(rotationX, -180, 180),
+            rotationY: state.rotationY + e.movementX,
+          });
+        };
 
-          window.addEventListener("mousemove", onMouseMove);
-          window.addEventListener("mouseup", onMouseUp);
-        }}
-      />
-    </>
+        const onPointerUp = () => {
+          window.removeEventListener("pointermove", onPointerMove);
+          window.removeEventListener("pointerup", onPointerUp);
+        };
+
+        window.addEventListener("pointermove", onPointerMove);
+        window.addEventListener("pointerup", onPointerUp);
+      }}
+    />
   );
 }
 

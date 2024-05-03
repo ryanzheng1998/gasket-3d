@@ -1,11 +1,10 @@
 import { mat4 } from "gl-matrix";
 import { useStore } from "../useStore";
-import { boxIndices } from "./boxIndices";
-import { boxVertex } from "./boxVertex";
 import fragmentShaderText from "./fragmentShader.glsl?raw";
+import { getPyramidVertex } from "./getPyramidVertex";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
-export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
+export const drawPyramid = (canvas: HTMLCanvasElement) => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
@@ -16,9 +15,7 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
     return;
   }
 
-  const vertexData = boxVertex;
-
-  const indices = boxIndices;
+  const vertexData = getPyramidVertex();
 
   //
   // create buffer and load data into it
@@ -26,14 +23,6 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
   const vertexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
-
-  const indexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  gl.bufferData(
-    gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(indices),
-    gl.STATIC_DRAW,
-  );
 
   //
   // vertex shader
@@ -101,9 +90,9 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
   //
   gl.useProgram(program);
   gl.enable(gl.DEPTH_TEST);
-  gl.enable(gl.CULL_FACE);
-  gl.frontFace(gl.CCW);
-  gl.cullFace(gl.BACK);
+  // gl.enable(gl.CULL_FACE);
+  // gl.frontFace(gl.CCW);
+  // gl.cullFace(gl.BACK);
 
   //
   // enable vertex attributes
@@ -163,7 +152,7 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
 
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
     },
     {
       fireImmediately: true,
@@ -176,7 +165,7 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     window.removeEventListener("resize", onResize);
-    drawBoxMouseRotate(canvas);
+    drawPyramid(canvas);
   };
 
   window.addEventListener("resize", onResize);
