@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { drawGasketVolumeSubdivision } from "./drawGasketVolumeSubdivision";
+import { drawGasketSurfaceSubdivision } from "./draw/drawGasketSurfaceSubdivision";
+import { drawGasketVolumeSubdivision } from "./draw/drawGasketVolumeSubdivision";
 import { clamp } from "./functions/clamp";
 import { useStore } from "./useStore";
 
@@ -8,8 +9,27 @@ export const Canvas = () => {
 
   useEffect(() => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    drawGasketVolumeSubdivision(canvas);
-  }, [state.divisionCount]);
+
+    if (state.gasketType === "volume") {
+      const cancel = drawGasketVolumeSubdivision(canvas);
+      return () => {
+        cancel?.();
+      };
+    }
+
+    const cancel = drawGasketSurfaceSubdivision(canvas);
+
+    return () => {
+      cancel?.();
+    };
+  }, [state.divisionCount, state.gasketType]);
+
+  useEffect(() => {
+    setInterval(() => {
+      const state = useStore.getState();
+      useStore.setState({ rotationY: state.rotationY + 1 });
+    }, 16);
+  }, []);
 
   return (
     <canvas

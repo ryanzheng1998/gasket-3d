@@ -1,4 +1,4 @@
-import { getAllCombination } from "../functions/getAllCombination";
+import { getAllCombination } from "../../functions/getAllCombination";
 
 export const getGasketVertex = (divisionCount: number) => {
   const answer: number[] = [];

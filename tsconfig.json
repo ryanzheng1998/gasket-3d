@@ -20,6 +20,6 @@
     // "noUnusedParameters": true,
     // "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/drawPyramid/data.ts"],
+  "include": ["src", "src/draw/drawPyramid/data.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,11 +1,11 @@
 import { mat4 } from "gl-matrix";
-import { useStore } from "../useStore";
-import { boxIndices } from "./boxIndices";
-import { boxVertex } from "./boxVertex";
+import { useStore } from "../../useStore";
 import fragmentShaderText from "./fragmentShader.glsl?raw";
+import { getGasketVertex } from "./getGasketVertex";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
-export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
+export const drawGasketSurfaceSubdivision = (canvas: HTMLCanvasElement) => {
+  const state = useStore.getState();
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
@@ -16,9 +16,7 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
     return;
   }
 
-  const vertexData = boxVertex;
-
-  const indices = boxIndices;
+  const vertexData = getGasketVertex(state.divisionCount);
 
   //
   // create buffer and load data into it
@@ -26,14 +24,6 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
   const vertexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
-
-  const indexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  gl.bufferData(
-    gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(indices),
-    gl.STATIC_DRAW,
-  );
 
   //
   // vertex shader
@@ -101,9 +91,9 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
   //
   gl.useProgram(program);
   gl.enable(gl.DEPTH_TEST);
-  gl.enable(gl.CULL_FACE);
-  gl.frontFace(gl.CCW);
-  gl.cullFace(gl.BACK);
+  // gl.enable(gl.CULL_FACE);
+  // gl.frontFace(gl.CCW);
+  // gl.cullFace(gl.BACK);
 
   //
   // enable vertex attributes
@@ -139,7 +129,7 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
   const viewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
 
-  mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
+  mat4.lookAt(viewMatrix, [0, 0, -4], [0, 0, 0], [0, 1, 0]);
   mat4.perspective(
     projectionMatrix,
     Math.PI / 4,
@@ -163,7 +153,7 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
 
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+      gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
     },
     {
       fireImmediately: true,
@@ -171,13 +161,22 @@ export const drawBoxMouseRotate = (canvas: HTMLCanvasElement) => {
   );
 
   const onResize = () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    gl.deleteBuffer(vertexBuffer);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
+    gl.deleteProgram(program);
 
-    gl.viewport(0, 0, canvas.width, canvas.height);
     window.removeEventListener("resize", onResize);
-    drawBoxMouseRotate(canvas);
+    drawGasketSurfaceSubdivision(canvas);
   };
 
   window.addEventListener("resize", onResize);
+
+  return () => {
+    gl.deleteBuffer(vertexBuffer);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
+    gl.deleteProgram(program);
+    window.removeEventListener("resize", onResize);
+  };
 };

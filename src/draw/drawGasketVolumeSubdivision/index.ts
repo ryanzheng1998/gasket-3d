@@ -1,5 +1,5 @@
 import { mat4 } from "gl-matrix";
-import { useStore } from "../useStore";
+import { useStore } from "../../useStore";
 import fragmentShaderText from "./fragmentShader.glsl?raw";
 import { getGasketVertex } from "./getGasketVertex";
 import vertexShaderText from "./vertexShader.glsl?raw";
@@ -15,6 +15,8 @@ export const drawGasketVolumeSubdivision = (canvas: HTMLCanvasElement) => {
     console.error("WebGL not supported");
     return;
   }
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
 
   const vertexData = getGasketVertex(state.divisionCount);
 
@@ -161,13 +163,21 @@ export const drawGasketVolumeSubdivision = (canvas: HTMLCanvasElement) => {
   );
 
   const onResize = () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.deleteBuffer(vertexBuffer);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
+    gl.deleteProgram(program);
     window.removeEventListener("resize", onResize);
     drawGasketVolumeSubdivision(canvas);
   };
 
   window.addEventListener("resize", onResize);
+
+  return () => {
+    gl.deleteBuffer(vertexBuffer);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
+    gl.deleteProgram(program);
+    window.removeEventListener("resize", onResize);
+  };
 };

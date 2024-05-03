@@ -1,10 +1,11 @@
 import { mat4 } from "gl-matrix";
-import { useStore } from "../useStore";
+import { useStore } from "../../useStore";
 import fragmentShaderText from "./fragmentShader.glsl?raw";
-import { getPyramidVertex } from "./getPyramidVertex";
+import { getGasketVertex } from "./getGasketVertex";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
-export const drawPyramid = (canvas: HTMLCanvasElement) => {
+export const drawGasket = (canvas: HTMLCanvasElement) => {
+  const state = useStore.getState();
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
@@ -15,7 +16,7 @@ export const drawPyramid = (canvas: HTMLCanvasElement) => {
     return;
   }
 
-  const vertexData = getPyramidVertex();
+  const vertexData = getGasketVertex(state.divisionCount);
 
   //
   // create buffer and load data into it
@@ -128,7 +129,7 @@ export const drawPyramid = (canvas: HTMLCanvasElement) => {
   const viewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
 
-  mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
+  mat4.lookAt(viewMatrix, [0, 0, -4], [0, 0, 0], [0, 1, 0]);
   mat4.perspective(
     projectionMatrix,
     Math.PI / 4,
@@ -165,7 +166,7 @@ export const drawPyramid = (canvas: HTMLCanvasElement) => {
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     window.removeEventListener("resize", onResize);
-    drawPyramid(canvas);
+    drawGasket(canvas);
   };
 
   window.addEventListener("resize", onResize);
