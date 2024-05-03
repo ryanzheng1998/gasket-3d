@@ -1,1 +1,1 @@
-# sierpiński gasket 
+# Sierpiński Gasket 

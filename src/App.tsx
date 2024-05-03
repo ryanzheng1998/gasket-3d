@@ -1,41 +1,25 @@
-import { useEffect } from "react";
-import { drawPyramid } from "./drawPyramid";
-import { clamp } from "./functions/clamp";
+import { Canvas } from "./Canvas";
 import { useStore } from "./useStore";
 
 function App() {
-  useEffect(() => {
-    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    drawPyramid(canvas);
-  }, []);
+  const state = useStore();
 
   return (
-    <canvas
-      id="canvas"
-      className="w-svh h-svh"
-      onPointerDown={(e) => {
-        e.currentTarget.setPointerCapture(e.pointerId);
+    <div>
+      <input
+        type="range"
+        value={state.divisionCount}
+        min={0}
+        max={10}
+        onChange={(e) => {
+          const value = e.target.value;
 
-        const onPointerMove = (e: MouseEvent) => {
-          const state = useStore.getState();
-
-          const rotationX = state.rotationX - e.movementY;
-
-          useStore.setState({
-            rotationX: clamp(rotationX, -180, 180),
-            rotationY: state.rotationY + e.movementX,
-          });
-        };
-
-        const onPointerUp = () => {
-          window.removeEventListener("pointermove", onPointerMove);
-          window.removeEventListener("pointerup", onPointerUp);
-        };
-
-        window.addEventListener("pointermove", onPointerMove);
-        window.addEventListener("pointerup", onPointerUp);
-      }}
-    />
+          useStore.setState({ divisionCount: parseInt(value) });
+        }}
+      />
+      <label>{state.divisionCount}</label>
+      <Canvas />
+    </div>
   );
 }
 
