@@ -10,7 +10,7 @@ function App() {
         type="range"
         value={state.divisionCount}
         min={0}
-        max={10}
+        max={7}
         onChange={(e) => {
           const value = e.target.value;
 

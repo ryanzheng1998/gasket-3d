@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { drawGasketSurfaceSubdivision } from "./drawGasketSurfaceSubdivision";
+import { drawGasketVolumeSubdivision } from "./drawGasketVolumeSubdivision";
 import { clamp } from "./functions/clamp";
 import { useStore } from "./useStore";
 
@@ -8,7 +8,7 @@ export const Canvas = () => {
 
   useEffect(() => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    drawGasketSurfaceSubdivision(canvas);
+    drawGasketVolumeSubdivision(canvas);
   }, [state.divisionCount]);
 
   return (

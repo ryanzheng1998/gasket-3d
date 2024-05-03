@@ -4,7 +4,7 @@ import fragmentShaderText from "./fragmentShader.glsl?raw";
 import { getGasketVertex } from "./getGasketVertex";
 import vertexShaderText from "./vertexShader.glsl?raw";
 
-export const drawGasketSurfaceSubdivision = (canvas: HTMLCanvasElement) => {
+export const drawGasketVolumeSubdivision = (canvas: HTMLCanvasElement) => {
   const state = useStore.getState();
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -166,7 +166,7 @@ export const drawGasketSurfaceSubdivision = (canvas: HTMLCanvasElement) => {
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     window.removeEventListener("resize", onResize);
-    drawGasketSurfaceSubdivision(canvas);
+    drawGasketVolumeSubdivision(canvas);
   };
 
   window.addEventListener("resize", onResize);
